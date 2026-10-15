@@ -1,0 +1,38 @@
+{
+  "name": "ditherdance",
+  "version": "0.1.0",
+  "description": "Fast, dependency-free dithering for ImageData: Floyd-Steinberg, Atkinson, Bayer and more, in the browser, a worker or Node.",
+  "keywords": ["dither", "dithering", "floyd-steinberg", "atkinson", "bayer", "ordered-dithering", "error-diffusion", "imagedata", "canvas", "pixel-art"],
+  "homepage": "https://dither.dance",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/biering/ditherdance.git"
+  },
+  "bugs": "https://github.com/biering/ditherdance/issues",
+  "author": "Christoph Biering (https://cbiering.com)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.0"
+  }
+}
