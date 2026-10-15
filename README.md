@@ -248,6 +248,17 @@ npm test
 npm run build
 ```
 
+## Releasing
+
+Bump `version` in `package.json`, commit, then push a matching tag:
+
+```sh
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The `release` workflow checks that the tag matches, runs the tests and
+publishes to npm with provenance.
+
 ## License
 
 [Apache-2.0](LICENSE). Made by [Christoph Biering](https://github.com/biering).
