@@ -1,10 +1,16 @@
 # ditherdance
 
-Fast, dependency-free dithering for anything shaped like `ImageData`.
-Floyd-Steinberg, Atkinson, Bayer and five more, in the browser, a Web Worker
-or Node.
+Dithering for the web, in two halves:
 
-**Website and live demo: [dither.dance](https://dither.dance)**
+- **Images.** Floyd-Steinberg, Atkinson, Bayer and five more, on anything
+  shaped like `ImageData`, in the browser, a Web Worker or Node. About 2 kB
+  gzipped.
+- **Gradients.** A dither gradient from any string: a soft color field,
+  pixelated and thresholded through a Bayer matrix by one WebGL shader. As a
+  `<dither-gradient>` element, a React component or plain JS. About 8 kB
+  gzipped.
+
+No dependencies. **Website, editor and live demo: [dither.dance](https://dither.dance)**
 
 ```ts
 import { dither, grayscale } from 'ditherdance'
@@ -14,7 +20,19 @@ dither(image, { method: 'atkinson', palette: grayscale(4) })
 ctx.putImageData(image, 0, 0)
 ```
 
-## Why this one
+```tsx
+import { DitherGradient } from 'ditherdance/react'
+
+<DitherGradient name={user.email} className="h-40 rounded-xl">
+  <h1>Children sit on top</h1>
+</DitherGradient>
+```
+
+## Images
+
+Try every method on your own picture at [dither.dance/image](https://dither.dance/image).
+
+### Why this one
 
 - **No dependencies, under 4 kB gzipped.** Tree-shakeable ES modules with types.
 - **Works on plain pixels.** Any `{ data, width, height }` with RGBA bytes:
@@ -34,7 +52,7 @@ Rough timings for one 1920x1080 frame on an M-series Mac, Node 22:
 | `atkinson` | | 41 ms |
 | `floyd-steinberg` | 38 ms | 60 ms |
 
-## Methods
+### Methods
 
 | `method` | Kind | Look |
 |---|---|---|
@@ -47,7 +65,7 @@ Rough timings for one 1920x1080 frame on an M-series Mac, Node 22:
 | `sierra-lite` | Error diffusion | Cheapest diffusion, three taps |
 | `bayer` | Ordered | A regular cross-hatch. Every pixel is independent, so it is the fastest, does not shimmer between video frames, and ports one to one to a GPU shader |
 
-## API
+### API
 
 ```ts
 dither(image, options?)    // any method, see below
@@ -86,7 +104,7 @@ diffuse(image, { kernel: { divisor: 2, taps: [[1, 0, 1], [0, 1, 1]] } })
 `bayer(size)` returns the threshold matrix itself, as offsets from -0.5 to 0.5,
 if you want to run ordered dithering in your own shader.
 
-### In a worker
+#### In a worker
 
 ```ts
 // worker.ts
@@ -97,7 +115,7 @@ self.onmessage = ({ data: { image, options } }) => {
 }
 ```
 
-### In Node
+#### In Node
 
 ```ts
 import sharp from 'sharp'
@@ -107,6 +125,108 @@ const { data, info } = await sharp('in.jpg').ensureAlpha().raw().toBuffer({ reso
 dither({ data, width: info.width, height: info.height }, { method: 'atkinson' })
 await sharp(data, { raw: info }).png().toFile('out.png')
 ```
+
+## Gradients
+
+Type a name at [dither.dance](https://dither.dance), or pin traits and copy the
+code in the [editor](https://dither.dance/editor).
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ditherdance@0.2/dist/element.js"></script>
+
+<dither-gradient name="ada@example.com" style="display: block; aspect-ratio: 4 / 3"></dither-gradient>
+```
+
+```ts
+import { createGradient } from 'ditherdance/gradient'
+
+const gradient = createGradient(document.querySelector('#hero'), { name: 'ada' })
+gradient.update({ pixelSize: 4 })
+```
+
+| Entry point | What it is |
+|---|---|
+| `ditherdance/gradient` | `createGradient`, `renderToDataURL`, `renderPixels` and the name functions |
+| `ditherdance/element` | registers `<dither-gradient>` on import |
+| `ditherdance/react` | `<DitherGradient>`, which renders a flat fallback color on the server |
+
+### Names
+
+`name` is the main input: a username, an email, a slug, an id. The same string
+renders the same gradient every time, in every engine. Names are NFC-normalized,
+trimmed and lowercased first (`normalizeName: false` hashes the raw string).
+
+A name decides eleven traits, each a 0..1 position hashed by its own key:
+
+| Trait | Reads as |
+|---|---|
+| `hue` | base hue, 0 to 360° |
+| `scheme` | analogous, complementary, split, mono or triad |
+| `tone` | night (mostly dark), dusk (dark and light), day (mostly light) |
+| `chroma` | how saturated the palette is |
+| `count` | 3, 4 or 5 colors |
+| `layout` | where the colors sit |
+| `softness`, `warp`, `warpScale` | how the colors melt into each other |
+| `streak`, `streakAngle` | drips; one name in five gets them |
+
+Pin a trait with `traits` and it holds for every name while the rest still vary:
+
+```ts
+createGradient(el, { name: user.id, traits: { tone: 0.1, hue: 0.62 } })
+// A list narrows without fixing: the name picks one of these.
+createGradient(el, { name: user.id, traits: { scheme: [0.2, 0.5] } })
+```
+
+Because traits are hashed by key rather than read from one random stream,
+adding a trait later cannot change existing gradients.
+
+### Options
+
+Explicit options always win over what the name or preset decided.
+
+| Option | Default | |
+|---|---|---|
+| `name` | | any string; drives everything below unless set |
+| `traits` | | pins, see above |
+| `preset` | | `haze`, `icefall`, `ember`, `solstice`, `abyss`, `lagoon`, `prism`, `frost`, `newsprint` |
+| `colors` | | 1 to 8 colors, `'#hex'` or `{ color, x, y }` with x/y in 0..1 |
+| `seed` | `1` | noise and scatter, when not using a name |
+| `softness` | `0.35` | blend radius, as a fraction of the height |
+| `warp`, `warpScale` | `0.3`, `1.6` | organic distortion |
+| `streak`, `streakAngle`, `streakScale` | `0`, `90`, `6` | drips |
+| `pixelSize` | `3` | one dither cell, in CSS pixels |
+| `dither` | `'bayer4'` | `'bayer2'`, `'bayer4'`, `'bayer8'`, `'noise'`, `'none'` |
+| `levels` | `7` | shades per channel |
+| `palette` | | quantize to exactly these colors (two for 1-bit) |
+| `animate` | `false` | `true`, or `'hover'`; respects reduced motion, pauses off screen |
+| `speed` | `1` | drift speed |
+
+As attributes on the element, the camelCase options become kebab-case
+(`pixel-size`, `streak-angle`), lists are comma-separated, and `traits` is JSON.
+
+### As an image
+
+```ts
+import { renderToDataURL } from 'ditherdance/gradient'
+
+el.style.backgroundImage = `url(${renderToDataURL({ name: slug }, { width: 1200, height: 630 })})`
+```
+
+`renderPixels(normalize(options), cols, rows)` is the same algorithm in plain
+JS. It returns RGBA bytes, one pixel per cell, and runs in Node.
+
+### How it works
+
+- **One WebGL context for the whole page.** Browsers keep about sixteen alive
+  and silently drop the oldest, so every gradient draws through a single shared
+  context and copies the result into its own 2D canvas. Without WebGL, the CPU
+  renderer takes over.
+- **One fragment per cell.** The canvas is rendered at cell resolution and
+  scaled up with `image-rendering: pixelated`. Cells are snapped to whole device
+  pixels, so the grid stays crisp instead of alternating 3 and 4 px.
+- **OKLab blending**, so the midpoint between two colors does not go grey.
+- **SSR-safe.** Importing on the server does nothing; the React component
+  renders a flat average color until it mounts.
 
 ## Install
 

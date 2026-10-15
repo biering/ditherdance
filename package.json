@@ -1,8 +1,26 @@
 {
   "name": "ditherdance",
-  "version": "0.1.0",
-  "description": "Fast, dependency-free dithering for ImageData: Floyd-Steinberg, Atkinson, Bayer and more, in the browser, a worker or Node.",
-  "keywords": ["dither", "dithering", "floyd-steinberg", "atkinson", "bayer", "ordered-dithering", "error-diffusion", "imagedata", "canvas", "pixel-art"],
+  "version": "0.2.0",
+  "description": "Dithering for the web. Dither any image with Floyd-Steinberg, Atkinson or Bayer, or draw a dither gradient from any string with WebGL, a web component or React.",
+  "keywords": [
+    "dither",
+    "dithering",
+    "floyd-steinberg",
+    "atkinson",
+    "bayer",
+    "ordered-dithering",
+    "error-diffusion",
+    "imagedata",
+    "canvas",
+    "pixel-art",
+    "gradient",
+    "mesh-gradient",
+    "webgl",
+    "web-component",
+    "react",
+    "avatar",
+    "generative"
+  ],
   "homepage": "https://dither.dance",
   "repository": {
     "type": "git",
@@ -12,16 +30,36 @@
   "author": "Christoph Biering (https://cbiering.com)",
   "license": "Apache-2.0",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/element.js",
+    "./src/element.ts"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./gradient": {
+      "types": "./dist/gradient/index.d.ts",
+      "default": "./dist/gradient/index.js"
+    },
+    "./element": {
+      "types": "./dist/element.d.ts",
+      "default": "./dist/element.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "default": "./dist/react.js"
     }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "src", "!src/**/*.test.ts"],
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx"
+  ],
   "engines": {
     "node": ">=18"
   },
@@ -31,7 +69,19 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.0"
   }
