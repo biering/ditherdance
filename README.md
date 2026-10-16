@@ -28,6 +28,16 @@ import { DitherGradient } from 'ditherdance/react'
 </DitherGradient>
 ```
 
+## Gallery
+
+Every tile is one string or preset, rendered by `scripts/gallery.mjs`.
+
+| <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/ada.png" width="180" alt="ada"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/grace.png" width="180" alt="grace"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/linus.png" width="180" alt="linus"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/margaret.png" width="180" alt="margaret"> |
+|:-:|:-:|:-:|:-:|
+| `name="ada@example.com"` | `name="grace"` | `name="linus"` | `name="margaret"` |
+| <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/ember.png" width="180" alt="ember"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/lagoon.png" width="180" alt="lagoon"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/prism.png" width="180" alt="prism"> | <img src="https://raw.githubusercontent.com/biering/ditherdance/main/docs/gallery/newsprint.png" width="180" alt="newsprint"> |
+| `preset="ember"` | `preset="lagoon"` | `preset="prism"` | `preset="newsprint"` |
+
 ## Images
 
 Try every method on your own picture at [dither.dance/image](https://dither.dance/image).
