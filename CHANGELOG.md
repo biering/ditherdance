@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/biering/ditherdance/compare/v0.3.0...v0.3.1) (2026-10-16)
+
+
+### Documentation
+
+* state the image half's size once, as about 2 kB gzipped ([#9](https://github.com/biering/ditherdance/issues/9)) ([8932083](https://github.com/biering/ditherdance/commit/89320837397042a37465e6ce9e9d9184fe8c787a))
+
 ## [0.3.0](https://github.com/biering/ditherdance/compare/v0.2.1...v0.3.0) (2026-10-16)
 
 
