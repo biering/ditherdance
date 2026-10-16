@@ -7,7 +7,7 @@ Dithering for the web, in two halves:
   gzipped.
 - **Gradients.** A dither gradient from any string: a soft color field,
   pixelated and thresholded through a Bayer matrix by one WebGL shader. As a
-  `<dither-gradient>` element, a React component or plain JS. About 8 kB
+  `<dither-gradient>` element, a React or Vue component, or plain JS. About 8 kB
   gzipped.
 
 No dependencies. **Website, editor and live demo: [dither.dance](https://dither.dance)**
@@ -149,6 +149,22 @@ gradient.update({ pixelSize: 4 })
 | `ditherdance/gradient` | `createGradient`, `renderToDataURL`, `renderPixels` and the name functions |
 | `ditherdance/element` | registers `<dither-gradient>` on import |
 | `ditherdance/react` | `<DitherGradient>`, which renders a flat fallback color on the server |
+| `ditherdance/vue` | the same `<DitherGradient>` for Vue 3, with a default slot |
+
+React and Vue are optional peer dependencies, and only `ditherdance/react` and
+`ditherdance/vue` import them. Everything else runs with no framework at all.
+
+```vue
+<script setup>
+import { DitherGradient } from 'ditherdance/vue'
+</script>
+
+<template>
+  <DitherGradient :name="user.email" class="h-40 rounded-xl">
+    <h1>Children sit on top</h1>
+  </DitherGradient>
+</template>
+```
 
 ### Names
 
@@ -225,8 +241,8 @@ JS. It returns RGBA bytes, one pixel per cell, and runs in Node.
   scaled up with `image-rendering: pixelated`. Cells are snapped to whole device
   pixels, so the grid stays crisp instead of alternating 3 and 4 px.
 - **OKLab blending**, so the midpoint between two colors does not go grey.
-- **SSR-safe.** Importing on the server does nothing; the React component
-  renders a flat average color until it mounts.
+- **SSR-safe.** Importing on the server does nothing; the React and Vue
+  components render a flat average color until they mount.
 
 ## Install
 
