@@ -5,47 +5,15 @@ import {
   useImperativeHandle,
   useRef,
 } from 'react'
+import { CLEARED, fallbackColor, OPTION_KEYS } from './gradient/component.js'
 import { createGradient, type GradientInstance } from './gradient/instance.js'
-import { type GradientOptions, normalize } from './gradient/options.js'
-
-const OPTION_KEYS = [
-  'name',
-  'traits',
-  'normalizeName',
-  'preset',
-  'colors',
-  'seed',
-  'softness',
-  'warp',
-  'warpScale',
-  'streak',
-  'streakAngle',
-  'streakScale',
-  'pixelSize',
-  'dither',
-  'levels',
-  'palette',
-  'animate',
-  'speed',
-] as const satisfies readonly (keyof GradientOptions)[]
-
-// update() merges, so a prop that was removed has to be sent as undefined.
-const CLEARED = Object.fromEntries(OPTION_KEYS.map((k) => [k, undefined])) as GradientOptions
+import type { GradientOptions } from './gradient/options.js'
 
 export type DitherGradientProps = GradientOptions &
   Omit<ComponentPropsWithoutRef<'div'>, keyof GradientOptions>
 
 export interface DitherGradientHandle {
   toBlob(): Promise<Blob | null>
-}
-
-function fallbackColor(options: GradientOptions): string | undefined {
-  try {
-    return normalize(options).fallback
-  } catch {
-    // A color only the browser can parse (oklch(), named): no placeholder on the server.
-    return undefined
-  }
 }
 
 /**
