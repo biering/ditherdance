@@ -273,7 +273,9 @@ too).
 
 Every push to `main` opens or updates a release PR with the next version and
 `CHANGELOG.md`. Merging it tags `vX.Y.Z`, creates the GitHub release and
-publishes to npm with provenance, through npm trusted publishing.
+stages the version on npm with provenance, through npm trusted publishing.
+It goes live once a maintainer approves it with 2FA on npmjs.com or with
+`npm stage list` and `npm stage approve <id>`.
 
 ## License
 
