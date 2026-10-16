@@ -1,6 +1,6 @@
 {
   "name": "ditherdance",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Dithering for the web. Dither any image with Floyd-Steinberg, Atkinson or Bayer, or draw a dither gradient from any string with WebGL, a web component, React or Vue.",
   "keywords": [
     "dither",
