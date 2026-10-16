@@ -3,11 +3,13 @@ name: release
 # On every push to main, release-please opens or updates a release PR that
 # bumps package.json and CHANGELOG.md from the conventional commits since the
 # last release. Merging that PR tags the release, creates the GitHub release
-# and publishes to npm, all in this one run: a tag pushed with GITHUB_TOKEN
-# does not start other workflows.
+# and stages it on npm, all in this one run: a tag pushed with GITHUB_TOKEN
+# does not start other workflows. A maintainer then approves the staged version
+# with 2FA on npmjs.com or with `npm stage approve` before it goes live.
 #
 # Auth: npm trusted publishing (OIDC), configured on npmjs.com for this repo
-# and this workflow file (release.yml). No token lives here.
+# and this workflow file (release.yml), limited to `npm stage publish`. No
+# token lives here.
 
 on:
   push:
@@ -47,11 +49,12 @@ jobs:
           ref: ${{ needs.release-please.outputs.tag_name }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 24 # npm 11, which trusted publishing needs
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      - run: npm install -g npm@^11.15.0 # `npm stage` needs 11.15
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
-      # `prepare` builds dist/ as part of publish.
-      - run: npm publish --provenance --access public
+      - run: npm run build
+      - run: npm stage publish --provenance --access public
