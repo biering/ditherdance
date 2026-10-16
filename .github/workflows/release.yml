@@ -1,18 +1,21 @@
 name: release
 
-# Publishes to npm when a version tag is pushed: git tag v0.2.0 && git push origin v0.2.0
+# On every push to main, release-please opens or updates a release PR that
+# bumps package.json and CHANGELOG.md from the conventional commits since the
+# last release. Merging that PR tags the release, creates the GitHub release
+# and publishes to npm, all in this one run: a tag pushed with GITHUB_TOKEN
+# does not start other workflows.
 #
-# Auth: npm trusted publishing (OIDC) once it is configured on npmjs.com for
-# this repo and workflow, so no token lives here. Until then, and for the very
-# first publish (npm only lets you configure a trusted publisher for a package
-# that already exists), the NPM_TOKEN repo secret is used instead.
+# Auth: npm trusted publishing (OIDC), configured on npmjs.com for this repo
+# and this workflow file (release.yml). No token lives here.
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
 
 permissions:
-  contents: read
+  contents: write # tags, releases, the release branch
+  pull-requests: write # the release PR
   id-token: write # trusted publishing and provenance
 
 concurrency:
@@ -20,27 +23,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
   publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24 # npm 11, which trusted publishing needs
           registry-url: https://registry.npmjs.org
           cache: npm
       - run: npm ci
-      - name: Tag matches package.json
-        run: |
-          version="v$(node -p 'require("./package.json").version')"
-          if [ "$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match package.json $version"
-            exit 1
-          fi
       - run: npm run typecheck
       - run: npm test
       # `prepare` builds dist/ as part of publish.
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

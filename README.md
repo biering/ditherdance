@@ -266,14 +266,14 @@ npm run build
 
 ## Releasing
 
-Bump `version` in `package.json`, commit, then push a matching tag:
+Releases are automated with [release-please](https://github.com/googleapis/release-please)
+and driven by [conventional commits](https://www.conventionalcommits.org):
+`fix:` bumps the patch, `feat:` the minor (and, before 1.0, a breaking change
+too).
 
-```sh
-git tag v0.2.0 && git push origin v0.2.0
-```
-
-The `release` workflow checks that the tag matches, runs the tests and
-publishes to npm with provenance.
+Every push to `main` opens or updates a release PR with the next version and
+`CHANGELOG.md`. Merging it tags `vX.Y.Z`, creates the GitHub release and
+publishes to npm with provenance, through npm trusted publishing.
 
 ## License
 
