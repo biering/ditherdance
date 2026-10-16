@@ -44,7 +44,7 @@ Try every method on your own picture at [dither.dance/image](https://dither.danc
 
 ### Why this one
 
-- **No dependencies, under 4 kB gzipped.** Tree-shakeable ES modules with types.
+- **No dependencies, about 2 kB gzipped.** Tree-shakeable ES modules with types.
 - **Works on plain pixels.** Any `{ data, width, height }` with RGBA bytes:
   a canvas's `ImageData`, an `OffscreenCanvas` in a worker, or a buffer from
   `sharp` in Node. No DOM required.
